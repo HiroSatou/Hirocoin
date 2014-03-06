@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>593</width>
+    <width>697</width>
     <height>360</height>
    </rect>
   </property>
@@ -92,7 +92,6 @@
        </property>
        <property name="text">
         <string notr="true">Copyright &amp;copy; 2009-YYYY The Bitcoin developers
-Copyright &amp;copy; 2011-YYYY The Litecoin developers
 Copyright &amp;copy; YYYY The Hirocoin developers</string>
        </property>
        <property name="textFormat">

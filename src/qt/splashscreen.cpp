@@ -22,8 +22,7 @@ SplashScreen::SplashScreen(const QPixmap &pixmap, Qt::WindowFlags f) :
     QString titleText       = QString(QApplication::applicationName()).replace(QString("-testnet"), QString(""), Qt::CaseSensitive); // cut of testnet, place it as single object further down
     QString versionText     = QString("Version %1 ").arg(QString::fromStdString(FormatFullVersion()));
     QString copyrightText1   = QChar(0xA9)+QString(" 2009-%1 ").arg(COPYRIGHT_YEAR) + QString(tr("The Bitcoin developers"));
-    QString copyrightText2   = QChar(0xA9)+QString(" 2011-%1 ").arg(COPYRIGHT_YEAR) + QString(tr("The Litecoin developers"));
-	QString copyrightText3   = QChar(0xA9)+QString(" %1 ").arg(COPYRIGHT_YEAR) + QString(tr("The Hirocoin developers"));
+    QString copyrightText2   = QChar(0xA9)+QString(" %1 ").arg(COPYRIGHT_YEAR) + QString(tr("The Hirocoin developers"));
 
     QString font            = "Arial";
 
@@ -46,7 +45,6 @@ SplashScreen::SplashScreen(const QPixmap &pixmap, Qt::WindowFlags f) :
     pixPaint.setFont(QFont(font, 9*fontFactor));
     pixPaint.drawText(paddingLeftCol2,paddingTopCol2+line1,copyrightText1);
     pixPaint.drawText(paddingLeftCol2,paddingTopCol2+line2,copyrightText2);
-	pixPaint.drawText(paddingLeftCol2,paddingTopCol2+line2,copyrightText3);
 
     pixPaint.end();
 
