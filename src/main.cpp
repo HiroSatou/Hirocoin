@@ -1071,7 +1071,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
     return nSubsidy + nFees;
 }
 
-static const int64 nTargetTimespan = 3.5 * 24 * 60 * 60; // Hirocoin: 3.5 days
+static const int64 nTargetTimespan = 24 * 60 * 60; // Hirocoin: 1 day
 static const int64 nTargetSpacing = 60; // Hirocoin: 1 minutes
 static const int64 nInterval = nTargetTimespan / nTargetSpacing;
 
