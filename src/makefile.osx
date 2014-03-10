@@ -24,12 +24,8 @@ USE_IPV6:=1
 
 LIBS= -dead_strip
 
-TESTDEFS = -DTEST_DATA_DIR=$(abspath test/data)
-
 ifdef STATIC
 # Build STATIC if you are redistributing the bitcoind binary
-TESTLIBS += \
- $(DEPSDIR)/lib/libboost_unit_test_framework-mt.a
 LIBS += \
  $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a \
  $(DEPSDIR)/lib/libboost_system-mt.a \
@@ -41,8 +37,6 @@ LIBS += \
  $(DEPSDIR)/lib/libcrypto.a \
  -lz
 else
-TESTLIBS += \
- -lboost_unit_test_framework-mt
 LIBS += \
  -ldb_cxx-4.8 \
  -lboost_system-mt \
@@ -53,7 +47,6 @@ LIBS += \
  -lssl \
  -lcrypto \
  -lz
-TESTDEFS += -DBOOST_TEST_DYN_LINK
 endif
 
 DEFS=-DMAC_OSX -DMSG_NOSIGNAL=0 -DBOOST_SPIRIT_THREADSAFE
@@ -132,9 +125,6 @@ endif
 
 all: hirocoind
 
-test check: test_hirocoin FORCE
-	./test_hirocoin
-
 #
 # LevelDB support
 #
@@ -146,7 +136,6 @@ leveldb/libleveldb.a:
 
 # auto-generated dependencies:
 -include obj/*.P
--include obj-test/*.P
 
 obj/build.h: FORCE
 	/bin/sh ../share/genbuild.sh obj/build.h
@@ -170,24 +159,10 @@ obj/%.o: %.cpp
 hirocoind: $(OBJS:obj/%=obj/%)
 	$(CXX) $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
 
-TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
-
-obj-test/%.o: test/%.cpp
-	$(CXX) -c $(TESTDEFS) $(CFLAGS) -MMD -MF $(@:%.o=%.d) -o $@ $<
-	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
-	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
-	  rm -f $(@:%.o=%.d)
-
-test_hirocoin: $(TESTOBJS) $(filter-out obj/init.o,$(OBJS:obj/%=obj/%))
-	$(CXX) $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS) $(TESTLIBS)
-
 clean:
-	-rm -f hirocoind test_hirocoin
+	-rm -f hirocoind
 	-rm -f obj/*.o
-	-rm -f obj-test/*.o
 	-rm -f obj/*.P
-	-rm -f obj-test/*.P
 	-rm -f obj/build.h
 	-cd leveldb && $(MAKE) clean || true
 

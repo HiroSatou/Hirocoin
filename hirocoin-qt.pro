@@ -313,17 +313,6 @@ SOURCES += src/qt/qrcodedialog.cpp
 FORMS += src/qt/forms/qrcodedialog.ui
 }
 
-contains(BITCOIN_QT_TEST, 1) {
-SOURCES += src/qt/test/test_main.cpp \
-    src/qt/test/uritests.cpp
-HEADERS += src/qt/test/uritests.h
-DEPENDPATH += src/qt/test
-QT += testlib
-TARGET = hirocoin-qt_test
-DEFINES += BITCOIN_QT_TEST
-  macx: CONFIG -= app_bundle
-}
-
 contains(USE_SSE2, 1) {
 DEFINES += USE_SSE2
 gccsse2.input  = SOURCES_SSE2
@@ -359,10 +348,6 @@ OTHER_FILES += README.md \
     doc/*.txt \
     doc/*.md \
     src/qt/res/bitcoin-qt.rc \
-    src/test/*.cpp \
-    src/test/*.h \
-    src/qt/test/*.cpp \
-    src/qt/test/*.h
 
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {

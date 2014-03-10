@@ -49,8 +49,6 @@ CFLAGS=-mthreads -O2 -w -Wall -Wextra -Wformat -Wformat-security -Wno-unused-par
 # enable: ASLR, DEP and large address aware
 LDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat -Wl,--large-address-aware
 
-TESTDEFS = -DTEST_DATA_DIR=$(abspath test/data)
-
 ifndef USE_UPNP
 	override USE_UPNP = -
 endif
@@ -110,9 +108,6 @@ endif
 
 all: hirocoind.exe
 
-test check: test_hirocoin.exe FORCE
-	test_hirocoin.exe
-
 #
 # LevelDB support
 #
@@ -131,18 +126,9 @@ obj/%.o: %.cpp $(HEADERS)
 hirocoind.exe: $(OBJS:obj/%=obj/%)
 	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
 
-TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
-
-obj-test/%.o: test/%.cpp $(HEADERS)
-	$(CXX) -c $(TESTDEFS) $(CFLAGS) -o $@ $<
-
-test_hirocoin.exe: $(TESTOBJS) $(filter-out obj/init.o,$(OBJS:obj/%=obj/%))
-	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ -lboost_unit_test_framework$(BOOST_SUFFIX) $(LIBS)
-
 clean:
-	rm -f hirocoind.exe test_hirocoin.exe
+	rm -f hirocoind.exe
 	rm -f obj/*
-	rm -f obj-test/*
 	cd leveldb && $(MAKE) TARGET_OS=NATIVE_WINDOWS clean && cd ..
 
 FORCE:

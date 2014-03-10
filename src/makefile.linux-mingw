@@ -36,8 +36,6 @@ xCXXFLAGS=-O2 -w -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter 
 # enable: ASLR, DEP and large address aware
 xLDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat -Wl,--large-address-aware -static-libgcc -static-libstdc++ $(LDFLAGS)
 
-TESTDEFS = -DTEST_DATA_DIR=$(abspath test/data)
-
 ifndef USE_UPNP
 	override USE_UPNP = -
 endif
@@ -117,20 +115,9 @@ obj/%.o: %.cpp $(HEADERS)
 hirocoind.exe: $(OBJS:obj/%=obj/%)
 	$(CXX) $(xCXXFLAGS) $(xLDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
 
-TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
-
-obj-test/%.o: test/%.cpp $(HEADERS)
-	$(CXX) -c $(TESTDEFS) $(xCXXFLAGS) -o $@ $<
-
-test_hirocoin.exe: $(TESTOBJS) $(filter-out obj/init.o,$(OBJS:obj/%=obj/%))
-	$(CXX) $(xCXXFLAGS) $(xLDFLAGS) -o $@ $(LIBPATHS) $^ -lboost_unit_test_framework-mt-s $(LIBS)
-
-
 clean:
 	-rm -f obj/*.o
 	-rm -f hirocoind.exe
-	-rm -f obj-test/*.o
-	-rm -f test_hirocoin.exe
 	-rm -f obj/build.h
 	cd leveldb && TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) clean && cd ..
 
