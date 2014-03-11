@@ -31,7 +31,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0xa5fbbb685e37455804a7bddba461ffc268da71bbea456843fdc097ee4f6188da");
+uint256 hashGenesisBlock("0x0000079dbd0ea897d280a549dc6defcab1128982d75468927cdfe86e6b85883b");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // Hirocoin: starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -577,7 +577,7 @@ bool CTransaction::CheckTransaction(CValidationState &state) const
 
     if (IsCoinBase())
     {
-        if (vin[0].scriptSig.size() < 2 || vin[0].scriptSig.size() > 100)
+        if (vin[0].scriptSig.size() < 2 || vin[0].scriptSig.size() > 200)
             return state.DoS(100, error("CTransaction::CheckTransaction() : coinbase script size"));
     }
     else
@@ -2705,7 +2705,13 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 0xc4;
         pchMessageStart[2] = 0xba;
         pchMessageStart[3] = 0xde;
-        hashGenesisBlock = uint256("0x332865499df77f269f1fa1c640075275abc3b452c21619bfe05f757a65a46c48");
+		// Testnet Genesis block:
+		// CBlock(hash=000005da8bc59dde4df823e8e43b3d285427d0e91194a7ff9f87ad672963210f, input=010000000000000000000000000000000000000000000000000000000000000000000000423382c6d2029f0a98f124978cbcf61761eff42304ae3c11ee61f317405d970931121f53f0ff0f1ea1a2bfd9, PoW=000005da8bc59dde4df823e8e43b3d285427d0e91194a7ff9f87ad672963210f, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342, nTime=1394545201, nBits=1e0ffff0, nNonce=3653214881, vtx=1)
+		// CTransaction(hash=09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+		// CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000, 4294967295), coinbase 04ffff001d01044c674a6170616e546f6461792031312f4d61722f3230313420544543484e4f4c4f475920536369656e74697374207572676573207769746864726177616c206f6620686973206f776e20627265616b7468726f756768207374656d2063656c6c207265736561726368)
+		// CTxOut(nValue=400.00000000, scriptPubKey=040184710fa689ad5023690c80f3a4)
+		// vMerkleTree: 09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342 
+        hashGenesisBlock = uint256("0x000005da8bc59dde4df823e8e43b3d285427d0e91194a7ff9f87ad672963210f");
     }
 
     //
@@ -2730,15 +2736,15 @@ bool InitBlockIndex() {
 
     // Only add the genesis block if not reindexing (in which case we reuse the one already on disk)
     if (!fReindex) {
-	// Genesis block:
-	// CBlock(hash=a5fbbb685e37455804a7, PoW=000006c189daf2bcac39, ver=1, hashPrevBlock=00000000000000000000, hashMerkleRoot=41bd021e02, nTime=1394109961, nBits=1e0ffff0, nNonce=1390580350, vtx=1)
-	// CTransaction(hash=41bd021e02cd48a9ec886e80338352b9bd0c7acf07d42793ddfba39d152ab534, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-    // CTxIn(COutPoint(0000000000, 4294967295), coinbase 04ffff001d01044c57436f696e4465736b2030362f4d61722f32303134204b6e434d696e65722046696e616c697a65732044657369676e20466f7220576f726c64732046697273742032306e6d20426974636f696e2041534943204d696e6572)
+	// Mainnet Genesis block:
+	// CBlock(hash=0000079dbd0ea897d280a549dc6defcab1128982d75468927cdfe86e6b85883b, input=010000000000000000000000000000000000000000000000000000000000000000000000423382c6d2029f0a98f124978cbcf61761eff42304ae3c11ee61f317405d970922121f53f0ff0f1e47c19949, PoW=0000079dbd0ea897d280a549dc6defcab1128982d75468927cdfe86e6b85883b, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342, nTime=1394545186, nBits=1e0ffff0, nNonce=1234813255, vtx=1)
+	// CTransaction(hash=09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+    // CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000, 4294967295), coinbase 04ffff001d01044c674a6170616e546f6461792031312f4d61722f3230313420544543484e4f4c4f475920536369656e74697374207572676573207769746864726177616c206f6620686973206f776e20627265616b7468726f756768207374656d2063656c6c207265736561726368)
     // CTxOut(nValue=400.00000000, scriptPubKey=040184710fa689ad5023690c80f3a4)
-	// vMerkleTree: 41bd021e02 
+    // vMerkleTree: 09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342 
 	
 	// Genesis block
-		const char* pszTimestamp = "CoinDesk 06/Mar/2014 KnCMiner Finalizes Design For Worlds First 20nm Bitcoin ASIC Miner";
+		const char* pszTimestamp = "JapanToday 11/Mar/2014 TECHNOLOGY Scientist urges withdrawal of his own breakthrough stem cell research";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2750,22 +2756,22 @@ bool InitBlockIndex() {
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1394109961;
+        block.nTime    = 1394545186;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce   = 1390580350;
+        block.nNonce   = 1234813255;
 
         if (fTestNet)
         {
-            block.nTime    = 1394110031;
-            block.nNonce   = 1389807017;
+            block.nTime    = 1394545201;
+            block.nNonce   = 3653214881;
         }
-
+	
         //// debug print
         uint256 hash = block.GetHash();
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("0x41bd021e02cd48a9ec886e80338352b9bd0c7acf07d42793ddfba39d152ab534"));
+        assert(block.hashMerkleRoot == uint256("0x09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342"));
 
         block.print();
         assert(hash == hashGenesisBlock);
