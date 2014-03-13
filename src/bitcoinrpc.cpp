@@ -244,8 +244,11 @@ static const CRPCCommand vRPCCommands[] =
     { "getwork",                &getwork,                true,      false,      true },
     { "getworkex",              &getworkex,              true,      false,      true },
     { "listaccounts",           &listaccounts,           false,     false,      true },
-	{ "makekeypair",            &makekeypair,            true,     	false,		true },
-	{ "sendalert",              &sendalert,              true,      false,		true },
+	{ "makekeypair",            &makekeypair,            true,     	false,		false },
+	{ "sendalert",              &sendalert,              true,      false,		false },
+    { "getcheckpoint",          &getcheckpoint,          true,      false,		false },
+    { "sendcheckpoint",         &sendcheckpoint,         true,      false,		false },
+    { "enforcecheckpoint",      &enforcecheckpoint,      true,      false,		false },
     { "settxfee",               &settxfee,               false,     false,      true },
     { "getblocktemplate",       &getblocktemplate,       true,      false,      false },
     { "submitblock",            &submitblock,            false,     false,      false },
@@ -1191,6 +1194,7 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
     if (strMethod == "importprivkey"          && n > 2) ConvertTo<bool>(params[2]);
     if (strMethod == "verifychain"            && n > 0) ConvertTo<boost::int64_t>(params[0]);
     if (strMethod == "verifychain"            && n > 1) ConvertTo<boost::int64_t>(params[1]);
+	if (strMethod == "enforcecheckpoint"      && n > 0) ConvertTo<bool>(params[0]);
 
     return params;
 }
