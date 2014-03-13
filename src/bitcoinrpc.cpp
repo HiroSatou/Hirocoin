@@ -244,6 +244,7 @@ static const CRPCCommand vRPCCommands[] =
     { "getwork",                &getwork,                true,      false,      true },
     { "getworkex",              &getworkex,              true,      false,      true },
     { "listaccounts",           &listaccounts,           false,     false,      true },
+	{ "makekeypair",            &makekeypair,            true,     	false,		true },
     { "settxfee",               &settxfee,               false,     false,      true },
     { "getblocktemplate",       &getblocktemplate,       true,      false,      false },
     { "submitblock",            &submitblock,            false,     false,      false },
