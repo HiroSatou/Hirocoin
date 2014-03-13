@@ -32,7 +32,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x0000079dbd0ea897d280a549dc6defcab1128982d75468927cdfe86e6b85883b");
+uint256 hashGenesisBlock("0x000002ba782d377ee807487d2171c47348821e89ba0a59ade6776e02f53054f1");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // Hirocoin: starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -578,7 +578,7 @@ bool CTransaction::CheckTransaction(CValidationState &state) const
 
     if (IsCoinBase())
     {
-        if (vin[0].scriptSig.size() < 2 || vin[0].scriptSig.size() > 200)
+        if (vin[0].scriptSig.size() < 2 || vin[0].scriptSig.size() > 100)
             return state.DoS(100, error("CTransaction::CheckTransaction() : coinbase script size"));
     }
     else
@@ -2820,12 +2820,12 @@ bool LoadBlockIndex()
         pchMessageStart[2] = 0xba;
         pchMessageStart[3] = 0xde;
 		// Testnet Genesis block:
-		// CBlock(hash=000005da8bc59dde4df823e8e43b3d285427d0e91194a7ff9f87ad672963210f, input=010000000000000000000000000000000000000000000000000000000000000000000000423382c6d2029f0a98f124978cbcf61761eff42304ae3c11ee61f317405d970931121f53f0ff0f1ea1a2bfd9, PoW=000005da8bc59dde4df823e8e43b3d285427d0e91194a7ff9f87ad672963210f, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342, nTime=1394545201, nBits=1e0ffff0, nNonce=3653214881, vtx=1)
-		// CTransaction(hash=09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-		// CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000, 4294967295), coinbase 04ffff001d01044c674a6170616e546f6461792031312f4d61722f3230313420544543484e4f4c4f475920536369656e74697374207572676573207769746864726177616c206f6620686973206f776e20627265616b7468726f756768207374656d2063656c6c207265736561726368)
-		// CTxOut(nValue=400.00000000, scriptPubKey=040184710fa689ad5023690c80f3a4)
-		// vMerkleTree: 09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342 
-        hashGenesisBlock = uint256("0x000005da8bc59dde4df823e8e43b3d285427d0e91194a7ff9f87ad672963210f");
+        // CBlock(hash=000008da0e16960d6c2548da4831323b956d61370e2a3fdc5150188c5c478c49, input=0100000000000000000000000000000000000000000000000000000000000000000000002a5d09737c826a5f8c12307a9c71774cd2e752e2910c9618744f05bc929d01b07ac92153f0ff0f1eb86e964c, PoW=000008da0e16960d6c2548da4831323b956d61370e2a3fdc5150188c5c478c49, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=b0019d92bc054f7418960c91e252e7d24c77719c7a30128c5f6a827c73095d2a, nTime=1394723194, nBits=1e0ffff0, nNonce=1284927160, vtx=1)
+        // CTransaction(hash=b0019d92bc054f7418960c91e252e7d24c77719c7a30128c5f6a827c73095d2a, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+        // CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000, 4294967295), coinbase 04ffff001d0104474a6170616e546f6461792031332f4d61722f323031342057617973206579656420746f206d616b6520706c616e65732065617369657220746f2066696e6420696e206f6365616e)
+        // CTxOut(nValue=400.00000000, scriptPubKey=040184710fa689ad5023690c80f3a4)
+        // vMerkleTree: b0019d92bc054f7418960c91e252e7d24c77719c7a30128c5f6a827c73095d2a 
+        hashGenesisBlock = uint256("0x000008da0e16960d6c2548da4831323b956d61370e2a3fdc5150188c5c478c49");
     }
 
     //
@@ -2851,14 +2851,13 @@ bool InitBlockIndex() {
     // Only add the genesis block if not reindexing (in which case we reuse the one already on disk)
     if (!fReindex) {
 	// Mainnet Genesis block:
-	// CBlock(hash=0000079dbd0ea897d280a549dc6defcab1128982d75468927cdfe86e6b85883b, input=010000000000000000000000000000000000000000000000000000000000000000000000423382c6d2029f0a98f124978cbcf61761eff42304ae3c11ee61f317405d970922121f53f0ff0f1e47c19949, PoW=0000079dbd0ea897d280a549dc6defcab1128982d75468927cdfe86e6b85883b, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342, nTime=1394545186, nBits=1e0ffff0, nNonce=1234813255, vtx=1)
-	// CTransaction(hash=09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-    // CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000, 4294967295), coinbase 04ffff001d01044c674a6170616e546f6461792031312f4d61722f3230313420544543484e4f4c4f475920536369656e74697374207572676573207769746864726177616c206f6620686973206f776e20627265616b7468726f756768207374656d2063656c6c207265736561726368)
+    // CBlock(hash=1267d7cab30e6d3f8638fa5ecd44a303ada9483e94c8c530ee60ded5bb068014, input=0100000000000000000000000000000000000000000000000000000000000000000000002a5d09737c826a5f8c12307a9c71774cd2e752e2910c9618744f05bc929d01b03bc92153f0ff0f1e8ae0914c, PoW=1267d7cab30e6d3f8638fa5ecd44a303ada9483e94c8c530ee60ded5bb068014, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=b0019d92bc054f7418960c91e252e7d24c77719c7a30128c5f6a827c73095d2a, nTime=1394723131, nBits=1e0ffff0, nNonce=1284628618, vtx=1)
+    // CTransaction(hash=b0019d92bc054f7418960c91e252e7d24c77719c7a30128c5f6a827c73095d2a, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+    // CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000, 4294967295), coinbase 04ffff001d0104474a6170616e546f6461792031332f4d61722f323031342057617973206579656420746f206d616b6520706c616e65732065617369657220746f2066696e6420696e206f6365616e)
     // CTxOut(nValue=400.00000000, scriptPubKey=040184710fa689ad5023690c80f3a4)
-    // vMerkleTree: 09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342 
+    // vMerkleTree: b0019d92bc054f7418960c91e252e7d24c77719c7a30128c5f6a827c73095d2a 
 	
-	// Genesis block
-		const char* pszTimestamp = "JapanToday 11/Mar/2014 TECHNOLOGY Scientist urges withdrawal of his own breakthrough stem cell research";
+		const char* pszTimestamp = "JapanToday 13/Mar/2014 Ways eyed to make planes easier to find in ocean";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2870,22 +2869,22 @@ bool InitBlockIndex() {
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1394545186;
+        block.nTime    = 1394723131;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce   = 1234813255;
+        block.nNonce   = 1234746574;
 
         if (fTestNet)
         {
-            block.nTime    = 1394545201;
-            block.nNonce   = 3653214881;
+            block.nTime    = 1394723194;
+            block.nNonce   = 1284927160;
         }
-	
+		
         //// debug print
         uint256 hash = block.GetHash();
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("0x09975d4017f361ee113cae0423f4ef6117f6bc8c9724f1980a9f02d2c6823342"));
+        assert(block.hashMerkleRoot == uint256("0xb0019d92bc054f7418960c91e252e7d24c77719c7a30128c5f6a827c73095d2a"));
 
         block.print();
         assert(hash == hashGenesisBlock);
