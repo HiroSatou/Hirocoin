@@ -2248,12 +2248,12 @@ bool CBlock::AcceptBlock(CValidationState &state, CDiskBlockPos *dbp)
             return state.Invalid(error("AcceptBlock() : block's timestamp is too early"));
 
         // Prevent blocks from too far in the future
-        if (GetBlockTime() > GetAdjustedTime() + 30 * 60) {
+        if (GetBlockTime() > GetAdjustedTime() + 15 * 60) {
             return error("AcceptBlock() : block's timestamp too far in the future");
         }
 
         // Check timestamp is not too far in the past
-        if (GetBlockTime() <= pindexPrev->GetBlockTime() - 30 * 60) {
+        if (GetBlockTime() <= pindexPrev->GetBlockTime() - 15 * 60) {
             return error("AcceptBlock() : block's timestamp is too early compare to last block");
         }
 
