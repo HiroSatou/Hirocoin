@@ -1067,7 +1067,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
     int64 nSubsidy = 400 * COIN;
 
     // Subsidy is cut in half every 840000 blocks, which will occur approximately every 4 years
-    nSubsidy >>= (nHeight / 2100000); // Hirocoin: 2.1m blocks in ~4 years
+    nSubsidy >>= (nHeight / 840000); // Hirocoin: 840,000 blocks in ~1.6 years
 
     return nSubsidy + nFees;
 }
