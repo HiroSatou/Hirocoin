@@ -61,6 +61,15 @@ contains(USE_QRCODE, 1) {
     LIBS += -lqrencode
 }
 
+# use: qmake "USE_ZXING=1"
+# libzxing https://github.com/ClaireDuSoleil/ZebraCrossing) must be available for support
+contains(USE_ZXING, 1) {
+    message(Building with ZXING support)
+    DEFINES += USE_ZXING
+    INCLUDEPATH += $$ZXING_INCLUDE_PATH
+    LIBS += $$join(ZXING_LIB_PATH,,-L,) -lzxing
+}
+
 # use: qmake "USE_UPNP=1" ( enabled by default; default)
 #  or: qmake "USE_UPNP=0" (disabled by default)
 #  or: qmake "USE_UPNP=-" (not supported)
@@ -338,6 +347,13 @@ SOURCES += src/qt/qrcodedialog.cpp
 FORMS += src/qt/forms/qrcodedialog.ui
 }
 
+contains(USE_ZXING, 1) {
+HEADERS += src/qt/snapwidget.h
+HEADERS += src/qt/qimagesource.h
+SOURCES += src/qt/qimagesource.cpp
+SOURCES += src/qt/snapwidget.cpp
+FORMS += src/qt/forms/snapwidget.ui
+}
 
 # Todo: Remove this line when switching to Qt5, as that option was removed
 CODECFORTR = UTF-8
