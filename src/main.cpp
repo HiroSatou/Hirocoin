@@ -48,6 +48,7 @@ bool fReindex = false;
 bool fBenchmark = false;
 bool fTxIndex = false;
 unsigned int nCoinCacheSize = 5000;
+static const int nHardForkOne = 55959;
 
 /** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) */
 int64 CTransaction::nMinTxFee = 100000;
@@ -1187,7 +1188,7 @@ unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const CBloc
         double EventHorizonDeviationSlow;
         
     if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || (uint64)BlockLastSolved->nHeight < PastBlocksMin) { return bnProofOfWorkLimit.GetCompact(); }
-        
+        int64 LatestBlockTime = BlockLastSolved->GetBlockTime();
         for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
                 if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
                 PastBlocksMass++;
@@ -1196,10 +1197,18 @@ unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const CBloc
                 else { PastDifficultyAverage = ((CBigNum().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev) / i) + PastDifficultyAveragePrev; }
                 PastDifficultyAveragePrev = PastDifficultyAverage;
                 
-                PastRateActualSeconds = BlockLastSolved->GetBlockTime() - BlockReading->GetBlockTime();
+                if (LatestBlockTime < BlockReading->GetBlockTime()) {
+                       if ((BlockReading->nHeight > nHardForkOne) || (fTestNet && (BlockReading->nHeight >= 10)))
+                               LatestBlockTime = BlockReading->GetBlockTime();
+               }
+               PastRateActualSeconds                   = LatestBlockTime - BlockReading->GetBlockTime();
                 PastRateTargetSeconds = TargetBlocksSpacingSeconds * PastBlocksMass;
                 PastRateAdjustmentRatio = double(1);
-                if (PastRateActualSeconds < 0) { PastRateActualSeconds = 0; }
+                if ((BlockReading->nHeight > nHardForkOne) || (fTestNet && (BlockReading->nHeight >= 10))) {
+                       if (PastRateActualSeconds < 1) { PastRateActualSeconds = 1; }
+               } else {
+                       if (PastRateActualSeconds < 0) { PastRateActualSeconds = 0; }
+               }
                 if (PastRateActualSeconds != 0 && PastRateTargetSeconds != 0) {
                 PastRateAdjustmentRatio = double(PastRateTargetSeconds) / double(PastRateActualSeconds);
                 }
@@ -1242,9 +1251,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
 {
         int DiffMode = 1;
         if (fTestNet) {
-            if (pindexLast->nHeight + 1 >= 10) {
 				DiffMode = 2;
-			}
         } else {
 			if (pindexLast->nHeight + 1 >= 15000) {
 				DiffMode = 2;
