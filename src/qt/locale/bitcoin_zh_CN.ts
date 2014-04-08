@@ -946,7 +946,7 @@ Address: %4
     <message>
         <location line="+9"/>
         <source>Whether to show Hirocoin addresses in the transaction list or not.</source>
-        <translation>是否需要在交易清单中显示Hiro币地址。</translation>
+        <translation>否需要在交易清单中显示Hiro币地址。</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2199,8 +2199,7 @@ Address: %4
     <message>
         <location line="-29"/>
         <source>Send command to -server or hirocoind</source>
-        <translation>发送命令到服务器或者 hirocoind
-</translation>
+        <translation>发送命令到服务器或者 hirocoind</translation>
     </message>
     <message>
         <location line="-23"/>
