@@ -15,6 +15,7 @@
 #include "optionsmodel.h"
 #include "transactionview.h"
 #include "overviewpage.h"
+#include "blockbrowser.h"
 #include "askpassphrasedialog.h"
 #include "ui_interface.h"
 
@@ -37,7 +38,7 @@ WalletView::WalletView(QWidget *parent, BitcoinGUI *_gui):
 {
     // Create tabs
     overviewPage = new OverviewPage();
-
+    blockBrowser = new BlockBrowser(this);
     transactionsPage = new QWidget(this);
     QVBoxLayout *vbox = new QVBoxLayout();
     QHBoxLayout *hbox_buttons = new QHBoxLayout();
@@ -66,11 +67,12 @@ WalletView::WalletView(QWidget *parent, BitcoinGUI *_gui):
     addWidget(addressBookPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
+    addWidget(blockBrowser);
 
     // Clicking on a transaction on the overview page simply sends you to transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), this, SLOT(gotoHistoryPage()));
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
-
+    connect(blockBrowser, SIGNAL(triggered()), this, SLOT(gotoBlockBrowser()));
     // Double-clicking on a transaction on the transaction history page shows details
     connect(transactionView, SIGNAL(doubleClicked(QModelIndex)), transactionView, SLOT(showDetails()));
 
@@ -124,6 +126,7 @@ void WalletView::setWalletModel(WalletModel *walletModel)
         receiveCoinsPage->setModel(walletModel->getAddressTableModel());
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
+        blockBrowser->setModel(clientModel);
 
         setEncryptionStatus();
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), gui, SLOT(setEncryptionStatus(int)));
@@ -157,6 +160,12 @@ void WalletView::gotoOverviewPage()
 {
     gui->getOverviewAction()->setChecked(true);
     setCurrentWidget(overviewPage);
+}
+
+void WalletView::gotoBlockBrowser()
+{
+    gui->getBlockAction()->setChecked(true);
+    setCurrentWidget(blockBrowser);
 }
 
 void WalletView::gotoHistoryPage()

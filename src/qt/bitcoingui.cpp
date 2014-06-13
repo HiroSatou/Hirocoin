@@ -25,6 +25,7 @@
 #include "ui_interface.h"
 #include "wallet.h"
 #include "init.h"
+#include "blockbrowser.h"
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
@@ -109,10 +110,13 @@ BitcoinGUI::BitcoinGUI(QWidget *parent) :
     frameBlocksLayout->setContentsMargins(3,0,3,0);
     frameBlocksLayout->setSpacing(3);
     labelEncryptionIcon = new QLabel();
+    labelBlockBrowserIcon = new QLabel();
     labelConnectionsIcon = new QLabel();
     labelBlocksIcon = new QLabel();
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelEncryptionIcon);
+    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelBlockBrowserIcon);
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelConnectionsIcon);
     frameBlocksLayout->addStretch();
@@ -172,7 +176,7 @@ void BitcoinGUI::createActions()
     overviewAction->setCheckable(true);
     overviewAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
     tabGroup->addAction(overviewAction);
-
+    
     sendCoinsAction = new QAction(QIcon(":/icons/send"), tr("&Send"), this);
     sendCoinsAction->setStatusTip(tr("Send coins to a Hirocoin address"));
     sendCoinsAction->setToolTip(sendCoinsAction->statusTip());
@@ -201,8 +205,16 @@ void BitcoinGUI::createActions()
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
     tabGroup->addAction(addressBookAction);
 
+    blockAction = new QAction(QIcon(":/icons/explorer"), tr("&Block Browser"), this);
+    blockAction->setStatusTip(tr("Browse blocks"));
+    blockAction->setToolTip(blockAction->statusTip());
+    blockAction->setCheckable(true);
+    blockAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
+    tabGroup->addAction(blockAction);
+    
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
+    connect(blockAction, SIGNAL(triggered()), this, SLOT(gotoBlockBrowser()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -295,6 +307,7 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(receiveCoinsAction);
     toolbar->addAction(historyAction);
     toolbar->addAction(addressBookAction);
+    toolbar->addAction(blockAction);
 }
 
 void BitcoinGUI::setClientModel(ClientModel *clientModel)
@@ -475,6 +488,11 @@ void BitcoinGUI::aboutClicked()
 void BitcoinGUI::gotoOverviewPage()
 {
     if (walletFrame) walletFrame->gotoOverviewPage();
+}
+
+void BitcoinGUI::gotoBlockBrowser()
+{
+    if (walletFrame) walletFrame->gotoBlockBrowser();
 }
 
 void BitcoinGUI::gotoHistoryPage()

@@ -83,6 +83,11 @@ void WalletFrame::gotoOverviewPage()
     walletStack->gotoOverviewPage();
 }
 
+void WalletFrame::gotoBlockBrowser()
+{
+    walletStack->gotoBlockBrowser();
+}
+
 void WalletFrame::gotoHistoryPage()
 {
     walletStack->gotoHistoryPage();
