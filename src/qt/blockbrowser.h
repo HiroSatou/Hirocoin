@@ -25,7 +25,6 @@ int getBlockTime(int);
 int getBlocknBits(int);
 int getBlockNonce(int);
 int blocksInPastHours(int);
-int getBlockHashrate(int);
 std::string getInputs(std::string);
 std::string getOutputs(std::string);
 std::string getBlockHash(int);

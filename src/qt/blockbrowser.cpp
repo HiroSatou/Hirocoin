@@ -9,6 +9,7 @@
 
 #include <sstream>
 #include <string>
+
 double getBlockHardness(int height)
 {
     const CBlockIndex* blockindex = getBlockIndex(height);
@@ -32,16 +33,6 @@ double getBlockHardness(int height)
     return dDiff;
 }
 
-int getBlockHashrate(int height)
-{
-    int lookup = height;
-
-    double timeDiff = getBlockTime(height) - getBlockTime(1);
-    double timePerBlock = timeDiff / lookup;
-
-    return (boost::int64_t)(((double)getBlockHardness(height) * pow(2.0, 32)) / timePerBlock);
-}
-
 const CBlockIndex* getBlockIndex(int height)
 {
     std::string hex = getBlockHash(height);
@@ -58,7 +49,6 @@ std::string getBlockHash(int Height)
     if (desiredheight < 0 || desiredheight > nBestHeight)
         return 0;
 
-    CBlock block;
     CBlockIndex* pblockindex = mapBlockIndex[hashBestChain];
     while (pblockindex->nHeight > desiredheight)
         pblockindex = pblockindex->pprev;
@@ -73,7 +63,6 @@ int getBlockTime(int Height)
     if (mapBlockIndex.count(hash) == 0)
         return 0;
 
-    CBlock block;
     CBlockIndex* pblockindex = mapBlockIndex[hash];
     return pblockindex->nTime;
 }
@@ -86,7 +75,6 @@ std::string getBlockMerkle(int Height)
     if (mapBlockIndex.count(hash) == 0)
         return 0;
 
-    CBlock block;
     CBlockIndex* pblockindex = mapBlockIndex[hash];
     return pblockindex->hashMerkleRoot.ToString().substr(0,10).c_str();
 }
@@ -99,7 +87,6 @@ int getBlocknBits(int Height)
     if (mapBlockIndex.count(hash) == 0)
         return 0;
 
-    CBlock block;
     CBlockIndex* pblockindex = mapBlockIndex[hash];
     return pblockindex->nBits;
 }
@@ -112,7 +99,6 @@ int getBlockNonce(int Height)
     if (mapBlockIndex.count(hash) == 0)
         return 0;
 
-    CBlock block;
     CBlockIndex* pblockindex = mapBlockIndex[hash];
     return pblockindex->nNonce;
 }
@@ -125,7 +111,6 @@ std::string getBlockDebug(int Height)
     if (mapBlockIndex.count(hash) == 0)
         return 0;
 
-    CBlock block;
     CBlockIndex* pblockindex = mapBlockIndex[hash];
     return pblockindex->ToString();
 }
@@ -160,8 +145,8 @@ double getTxTotalValue(std::string txid)
 
     CTransaction tx;
     uint256 hashBlock = 0;
-    if (!GetTransaction(hash, tx, hashBlock))
-        return 1000;
+    if (!GetTransaction(hash, tx, hashBlock, true))
+        return 0;
 
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
     ssTx << tx;
@@ -191,8 +176,8 @@ std::string getOutputs(std::string txid)
 
     CTransaction tx;
     uint256 hashBlock = 0;
-    if (!GetTransaction(hash, tx, hashBlock))
-        return "fail";
+    if (!GetTransaction(hash, tx, hashBlock, true))
+        return "";
 
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
     ssTx << tx;
@@ -224,8 +209,8 @@ std::string getInputs(std::string txid)
 
     CTransaction tx;
     uint256 hashBlock = 0;
-    if (!GetTransaction(hash, tx, hashBlock))
-        return "fail";
+    if (!GetTransaction(hash, tx, hashBlock, true))
+        return "";
 
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
     ssTx << tx;
@@ -233,13 +218,13 @@ std::string getInputs(std::string txid)
     std::string str = "";
     for (unsigned int i = 0; i < tx.vin.size(); i++)
     {
-        uint256 hash;
+        uint256 hash0;
         const CTxIn& vin = tx.vin[i];
-        hash.SetHex(vin.prevout.hash.ToString());
+        hash0.SetHex(vin.prevout.hash.ToString());
         CTransaction wtxPrev;
-        uint256 hashBlock = 0;
-        if (!GetTransaction(hash, wtxPrev, hashBlock))
-             return "fail";
+        uint256 hashBlock0 = 0;
+        if (!GetTransaction(hash0, wtxPrev, hashBlock0, true))
+             return "";
 
         CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
         ssTx << wtxPrev;
@@ -254,7 +239,7 @@ std::string getInputs(std::string txid)
         str.append(lol6);
         str.append(": ");
         str.append(amount);
-        str.append("SC");
+        str.append(" HIRO");
         str.append("\n");
     }
 
@@ -282,8 +267,8 @@ double getTxFees(std::string txid)
 
     CTransaction tx;
     uint256 hashBlock = 0;
-    if (!GetTransaction(hash, tx, hashBlock))
-        return 0.0001;
+    if (!GetTransaction(hash, tx, hashBlock, true))
+        return 0.0000;
 
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
     ssTx << tx;
@@ -307,7 +292,7 @@ double getTxFees(std::string txid)
         hash0.SetHex(vin.prevout.hash.ToString());
         CTransaction wtxPrev;
         uint256 hashBlock0 = 0;
-        if (!GetTransaction(hash0, wtxPrev, hashBlock0))
+        if (!GetTransaction(hash0, wtxPrev, hashBlock0, true))
              return 0;
         CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
         ssTx << wtxPrev;
@@ -350,17 +335,12 @@ void BlockBrowser::updateExplorer(bool block)
         ui->timeBox->show();
         ui->hardLabel->show();
         ui->hardBox->show();;
-        ui->pawLabel->show();
-        ui->pawBox->show();
         int height = ui->heightBox->value();
         if (height > pindexBest->nHeight)
         {
             ui->heightBox->setValue(pindexBest->nHeight);
             height = pindexBest->nHeight;
         }
-        int Pawrate = getBlockHashrate(height);
-        double Pawrate2 = 0.000;
-        Pawrate2 = ((double)Pawrate / 1000000);
         std::string hash = getBlockHash(height);
         std::string merkle = getBlockMerkle(height);
         int nBits = getBlocknBits(height);
@@ -374,7 +354,6 @@ void BlockBrowser::updateExplorer(bool block)
         QString QNonce = QString::number(nNonce);
         QString QTime = QString::number(atime);
         QString QHardness = QString::number(hardness, 'f', 6);
-        QString QPawrate = QString::number(Pawrate2, 'f', 3);
         ui->heightLabel->setText(QHeight);
         ui->hashBox->setText(QHash);
         ui->merkleBox->setText(QMerkle);
@@ -382,7 +361,6 @@ void BlockBrowser::updateExplorer(bool block)
         ui->nonceBox->setText(QNonce);
         ui->timeBox->setText(QTime);     
         ui->hardBox->setText(QHardness);
-        ui->pawBox->setText(QPawrate + " MH/s");
     } 
     
     if(block == false) {
@@ -406,11 +384,11 @@ void BlockBrowser::updateExplorer(bool block)
         QString QOutputs = QString::fromUtf8(outputs.c_str());
         QString QInputs = QString::fromUtf8(inputs.c_str());
         QString QFees = QString::number(fees, 'f', 6);
-        ui->valueBox->setText(QValue + " SC");
+        ui->valueBox->setText(QValue + " HIRO");
         ui->txID->setText(QID);
         ui->outputBox->setText(QOutputs);
         ui->inputBox->setText(QInputs);
-        ui->feesBox->setText(QFees + " SC");
+        ui->feesBox->setText(QFees + " HIRO");
     }
 }
 
