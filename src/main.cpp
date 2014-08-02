@@ -12,6 +12,7 @@
 #include "ui_interface.h"
 #include "checkqueue.h"
 #include "checkpointsync.h"
+#include "bitcoinrpc.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -1063,9 +1064,32 @@ uint256 static GetOrphanRoot(const CBlockHeader* pblock)
     return pblock->GetHash();
 }
 
-int64 static GetBlockValue(int nHeight, int64 nFees)
+int64 static GetBlockValue(const CBlockIndex* pindexLast, int64 nFees, bool addOne)
 {
+    int nHeight = pindexLast->nHeight;
+    if (addOne) {nHeight += 1;}
     int64 nSubsidy = 400 * COIN;
+    const CBlockIndex* pindexFirst = pindexLast;
+    if (nHeight > 200) {
+        double diffTotal = 0;
+        double lastDiff = GetDifficulty(pindexLast);
+        double weight = 0;
+        int mockSubsidy = 200;
+
+        for (int i = 0; pindexFirst && i < 100; i++) {
+            pindexFirst = pindexFirst->pprev;
+            diffTotal += GetDifficulty(pindexFirst);
+        }
+
+        weight = (diffTotal / 100) / lastDiff;
+        
+        if (weight > 2) weight = 2;
+        if (weight < 0.2) weight = 0.2;
+        
+        mockSubsidy *= weight;
+
+        printf("Height = %i Total = %f Last = %f Weight = %f Mock Reward = %i \n", nHeight, diffTotal, lastDiff, weight, mockSubsidy);
+    }
 
     // Subsidy is cut in half every 840000 blocks, which will occur approximately every 4 years
     nSubsidy >>= (nHeight / 840000); // Hirocoin: 840,000 blocks in ~1.6 years
@@ -1790,8 +1814,8 @@ bool CBlock::ConnectBlock(CValidationState &state, CBlockIndex* pindex, CCoinsVi
     if (fBenchmark)
         printf("- Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin)\n", (unsigned)vtx.size(), 0.001 * nTime, 0.001 * nTime / vtx.size(), nInputs <= 1 ? 0 : 0.001 * nTime / (nInputs-1));
 
-    if (vtx[0].GetValueOut() > GetBlockValue(pindex->nHeight, nFees))
-        return state.DoS(100, error("ConnectBlock() : coinbase pays too much (actual=%"PRI64d" vs limit=%"PRI64d")", vtx[0].GetValueOut(), GetBlockValue(pindex->nHeight, nFees)));
+    if (vtx[0].GetValueOut() > GetBlockValue(pindex, nFees, false))
+        return state.DoS(100, error("ConnectBlock() : coinbase pays too much (actual=%"PRI64d" vs limit=%"PRI64d")", vtx[0].GetValueOut(), GetBlockValue(pindex, nFees, false)));
 
     if (!control.Wait())
         return state.DoS(100, false);
@@ -4542,7 +4566,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         nLastBlockSize = nBlockSize;
         printf("CreateNewBlock(): total size %"PRI64u"\n", nBlockSize);
 
-        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
+        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev, nFees, true);
         pblocktemplate->vTxFees[0] = -nFees;
 
         // Fill in header
