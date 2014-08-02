@@ -1068,31 +1068,25 @@ int64 static GetBlockValue(const CBlockIndex* pindexLast, int64 nFees, bool addO
 {
     int nHeight = pindexLast->nHeight;
     if (addOne) {nHeight += 1;}
-    int64 nSubsidy = 400 * COIN;
+    int mockSubsidy = 400;
     const CBlockIndex* pindexFirst = pindexLast;
-    if (nHeight > 200) {
+    if (nHeight > 224000) {
+        mockSubsidy = 200; // Average reward
         double diffTotal = 0;
         double lastDiff = GetDifficulty(pindexLast);
-        double weight = 0;
-        int mockSubsidy = 200;
-
         for (int i = 0; pindexFirst && i < 100; i++) {
             pindexFirst = pindexFirst->pprev;
             diffTotal += GetDifficulty(pindexFirst);
         }
-
-        weight = (diffTotal / 100) / lastDiff;
-        
-        if (weight > 2) weight = 2;
-        if (weight < 0.2) weight = 0.2;
-        
+        double weight = (diffTotal / 100) / lastDiff;
+        if (weight > 2) weight = 2; // Max 400 reward
+        if (weight < 0.2) weight = 0.2; // Min 40 reward
         mockSubsidy *= weight;
-
-        printf("Height = %i Total = %f Last = %f Weight = %f Mock Reward = %i \n", nHeight, diffTotal, lastDiff, weight, mockSubsidy);
     }
+    int64 nSubsidy = mockSubsidy * COIN;
 
-    // Subsidy is cut in half every 840000 blocks, which will occur approximately every 4 years
-    nSubsidy >>= (nHeight / 840000); // Hirocoin: 840,000 blocks in ~1.6 years
+    // Subsidy is cut in half every 840000 blocks, which will occur approximately every ~1.6 years
+    nSubsidy >>= (nHeight / 840000);
 
     return nSubsidy + nFees;
 }
